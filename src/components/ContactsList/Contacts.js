@@ -2,10 +2,14 @@ import s from './Contacts.module.css';
 
 import PropTypes from 'prop-types';
 
-export default function Contacts({ item, clickDelete }) {
+import { connect } from 'react-redux';
+
+import * as info from '../../redux/contacts/contacts-actions';
+
+function Contacts({ item, clickDelete }) {
   return (
     <ul className={s.list}>
-      {item.map(({ name, number, id }) => {
+      {item.map(({ id, text: { name, number } }) => {
         return (
           <li key={id} className={s.item}>
             <p>{name}:</p>
@@ -23,6 +27,26 @@ export default function Contacts({ item, clickDelete }) {
     </ul>
   );
 }
+
+function showContacts(allContacts, filter) {
+  const normalizedFilter = filter.toLowerCase();
+  return allContacts.filter(
+    ({ text: { name } }) => name && name.includes(normalizedFilter)
+  );
+}
+
+const mapStateToProps = state => {
+  const { contacts, filter } = state.contacts;
+  const visibleContacts = showContacts(contacts, filter);
+
+  return { item: visibleContacts };
+};
+
+const mapDispatchToProps = dispatch => ({
+  clickDelete: id => dispatch(info.deleteContact(id)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Contacts);
 
 Contacts.propTypes = {
   clickDelete: PropTypes.func,
