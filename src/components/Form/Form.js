@@ -1,38 +1,36 @@
 import s from './Form.module.css';
-import { useState } from 'react';
+import { useEffect } from 'react';
+
+import { connect } from 'react-redux';
+
+import * as info from '../../redux/form/actions-form';
+
+import { addContact } from 'redux/contacts/contacts-actions';
 
 import PropTypes from 'prop-types';
 
-export default function Form({ verificateContact, onSubmit }) {
-  const [name, setName] = useState('');
-  const [number, setNumber] = useState('');
-
-  const handleChange = e => {
-    const { name, value } = e.currentTarget;
-
-    switch (name) {
-      case 'number':
-        setNumber(value);
-        break;
-      case 'name':
-        setName(value);
-        break;
-      default:
-        break;
-    }
-  };
-
+function Form({
+  name,
+  number,
+  onSubmit,
+  changeName,
+  changeNumber,
+  contacts,
+  resetForm,
+}) {
   const handleSubmut = e => {
     e.preventDefault();
-    const isValidate = verificateContact(name);
-    setName('');
-    setNumber('');
+    const isValidate = contacts.find(item => item.text.name === name);
+    isValidate && alert(`${name} is already in contacts`);
+    resetForm();
     if (isValidate) return;
 
     onSubmit({ name, number });
-    setName('');
-    setNumber('');
+    resetForm();
   };
+  useEffect(() => {
+    window.localStorage.setItem('contacts', JSON.stringify(contacts));
+  });
 
   return (
     <form onSubmit={handleSubmut} className={s.form}>
@@ -45,7 +43,7 @@ export default function Form({ verificateContact, onSubmit }) {
           title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
           required
           value={name}
-          onChange={handleChange}
+          onChange={changeName}
         />
       </label>
 
@@ -57,7 +55,7 @@ export default function Form({ verificateContact, onSubmit }) {
           pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
           title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
           required
-          onChange={handleChange}
+          onChange={changeNumber}
           value={number}
         />
       </label>
@@ -70,7 +68,25 @@ export default function Form({ verificateContact, onSubmit }) {
   );
 }
 
+const mapStateToProps = state => {
+  return {
+    name: state.form.name,
+    number: state.form.number,
+    contacts: state.contacts.contacts,
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    changeName: e => dispatch(info.name(e.target.value)),
+    changeNumber: e => dispatch(info.number(e.target.value)),
+    onSubmit: text => dispatch(addContact(text)),
+    resetForm: () => dispatch(info.reset()),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Form);
+
 Form.propTypes = {
-  verificateContact: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
 };
