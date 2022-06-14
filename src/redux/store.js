@@ -13,4 +13,12 @@ const rootReducer = combineReducers({
 
 const store = createStore(rootReducer, composeWithDevTools());
 
+store.subscribe(() => {
+  const state = store.getState();
+  window.localStorage.setItem(
+    'contacts',
+    JSON.stringify(state.contacts.contacts)
+  );
+});
+
 export default store;
