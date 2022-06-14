@@ -31,9 +31,3 @@ export default combineReducers({
   contacts,
   filter,
 });
-
-// const a = [{ name: 'jon', hobby: 'box' }];
-
-// const b = a.find(item => item.name === 'jox');
-
-// console.log(b);
