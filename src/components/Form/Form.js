@@ -1,27 +1,37 @@
 import s from './Form.module.css';
 
-import { connect } from 'react-redux';
-
-import * as info from '../../redux/form/actions-form';
-
 import PropTypes from 'prop-types';
 
-function Form({
-  name,
-  number,
-  onSubmit,
-  changeName,
-  changeNumber,
-  resetForm,
-  checkName,
-}) {
+import { useState } from 'react';
+
+export default function Form({ onSubmit, resetForm, checkName }) {
+  const [name, setName] = useState('');
+  const [number, setNumber] = useState('');
+
+  const handleChange = e => {
+    const { name, value } = e.currentTarget;
+
+    switch (name) {
+      case 'number':
+        setNumber(value);
+        break;
+      case 'name':
+        setName(value);
+        break;
+      default:
+        break;
+    }
+  };
+
   const handleSubmut = e => {
     e.preventDefault();
     const isValidate = checkName(name);
-    resetForm();
+    setName('');
+    setNumber('');
     if (isValidate) return;
     onSubmit({ name, number });
-    resetForm();
+    setName('');
+    setNumber('');
   };
   return (
     <form onSubmit={handleSubmut} className={s.form}>
@@ -34,7 +44,7 @@ function Form({
           title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
           required
           value={name}
-          onChange={changeName}
+          onChange={handleChange}
         />
       </label>
 
@@ -46,7 +56,7 @@ function Form({
           pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
           title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
           required
-          onChange={changeNumber}
+          onChange={handleChange}
           value={number}
         />
       </label>
@@ -58,23 +68,6 @@ function Form({
     </form>
   );
 }
-
-const mapStateToProps = state => {
-  return {
-    name: state.form.name,
-    number: state.form.number,
-  };
-};
-
-const mapDispatchToProps = dispatch => {
-  return {
-    changeName: e => dispatch(info.name(e.target.value)),
-    changeNumber: e => dispatch(info.number(e.target.value)),
-    resetForm: () => dispatch(info.reset()),
-  };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(Form);
 
 Form.propTypes = {
   onSubmit: PropTypes.func.isRequired,

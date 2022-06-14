@@ -28,10 +28,12 @@ function App({ onSubmit, contacts }) {
   );
 }
 
-const mapStateToProps = state => ({
-  contacts: state.contacts.contacts,
-  name: state.form,
-});
+const mapStateToProps = state => {
+  const { contacts } = state.contacts;
+  return {
+    contacts,
+  };
+};
 
 const mapDispatchToProps = dispatch => ({
   onSubmit: text => dispatch(addContact(text)),
