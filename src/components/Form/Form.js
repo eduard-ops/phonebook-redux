@@ -1,11 +1,8 @@
 import s from './Form.module.css';
-import { useEffect } from 'react';
 
 import { connect } from 'react-redux';
 
 import * as info from '../../redux/form/actions-form';
-
-import { addContact } from 'redux/contacts/contacts-actions';
 
 import PropTypes from 'prop-types';
 
@@ -15,23 +12,17 @@ function Form({
   onSubmit,
   changeName,
   changeNumber,
-  contacts,
   resetForm,
+  checkName,
 }) {
   const handleSubmut = e => {
     e.preventDefault();
-    const isValidate = contacts.find(item => item.text.name === name);
-    isValidate && alert(`${name} is already in contacts`);
+    const isValidate = checkName(name);
     resetForm();
     if (isValidate) return;
-
     onSubmit({ name, number });
     resetForm();
   };
-  useEffect(() => {
-    window.localStorage.setItem('contacts', JSON.stringify(contacts));
-  });
-
   return (
     <form onSubmit={handleSubmut} className={s.form}>
       <label className={s.label}>
@@ -72,7 +63,6 @@ const mapStateToProps = state => {
   return {
     name: state.form.name,
     number: state.form.number,
-    contacts: state.contacts.contacts,
   };
 };
 
@@ -80,7 +70,6 @@ const mapDispatchToProps = dispatch => {
   return {
     changeName: e => dispatch(info.name(e.target.value)),
     changeNumber: e => dispatch(info.number(e.target.value)),
-    onSubmit: text => dispatch(addContact(text)),
     resetForm: () => dispatch(info.reset()),
   };
 };
